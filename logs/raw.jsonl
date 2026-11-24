@@ -1,0 +1,1 @@
+{"log":"{\"log\":\"192.168.56.1 - - [24/Nov/2026:04:32:47 +0000] \\\"GET /login.php HTTP/1.1\\\" 200 980 \\\"-\\\" \\\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36\\\"\\n\",\"stream\":\"stdout\",\"time\":\"2026-11-24T04:32:52.670448679Z\"}"}

@@ -1,0 +1,27 @@
+# compose.yaml
+services:
+  db:
+    image: mariadb:10
+    container_name: soc-db
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: socdb
+      MARIADB_USER: student
+      MARIADB_PASSWORD: p@ssw0rd
+    volumes:
+      - soc_db_data:/var/lib/mysql
+    restart: unless-stopped
+
+  fluent-bit:
+    image: fluent/fluent-bit:3.2
+    container_name: soc-fluent-bit
+    ports:
+      - "192.168.56.140:24224:24224"
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./logs:/logs 
+    command: ["-c", "/fluent-bit/etc/fluent-bit.conf"]
+    restart: unless-stopped
+
+volumes:
+  soc_db_data:
