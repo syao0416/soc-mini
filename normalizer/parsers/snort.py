@@ -3,7 +3,46 @@ import re
 import ipaddress
 from datetime import datetime
 
-from normalizer.normalizer import normalize_log
+from normalizer.normalizer import normalize_log, KST
+
+# 연도 추정 Snort 발생시간 변환
+# 단, 기록 시점의 메타데이터가 없으면 현재 KST 기준으로 연도를 추정하기에
+# 예: 12/31-23:59:59.999999 -> 2023/12/31-23:59:59.999999
+# 발생시간출처에 추정사실 남김
+def parse_snort_time(value, reference_time=None):
+
+    reference = reference_time or datetime.now(KST)
+
+    reference = reference.astimezone(KST)
+
+    candidates = []
+
+    for year in (
+        reference.year - 1,
+        reference.year,
+        reference.year + 1
+    ):
+
+        try:
+            candidate = datetime.strptime(
+                f"{year}/{value}",
+                "%Y/%m/%d-%H:%M:%S.%f"
+            ).replace(tzinfo=KST)
+
+            candidates.append(candidate)
+
+        except ValueError:
+            continue
+
+    if not candidates:
+        raise ValueError("Snort 발생시간 변환 실패")
+
+    nearest = min(
+        candidates,
+        key=lambda dt: abs(dt - reference)
+    )
+
+    return nearest.isoformat()
 
 
 def split_endpoint(endpoint):
@@ -41,7 +80,7 @@ def split_endpoint(endpoint):
     return endpoint, None
 
 
-def parse_snort(raw_log):
+def parse_snort(raw_log, reference_time=None):
 
     pattern = (
         r"(?P<timestamp>\d{2}/\d{2}-"
@@ -68,10 +107,10 @@ def parse_snort(raw_log):
     try:
         priority = int(data["priority"])
 
-        timestamp = datetime.strptime(
-            f"{datetime.now().year}/{data['timestamp']}",
-            "%Y/%m/%d-%H:%M:%S.%f"
-        ).isoformat()
+        timestamp = parse_snort_time(
+            data["timestamp"],
+            reference_time
+        )
 
     except ValueError:
         return None
