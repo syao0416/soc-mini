@@ -19,26 +19,26 @@ SOURCE_TZ = {
 
 # 이벤트 대분류
 EVENT_CATEGORIES = {
-    "snort": "침입 탐지",
-    "iptables": "네트워크 트래픽",
-    "dvwa": "웹 서비스",
-    "mariadb": "데이터베이스"
+    "snort": "intrusion_detection",
+    "iptables": "network_traffic",
+    "dvwa": "web_service",
+    "mariadb": "database"
 }
 
 
 # 세부 이벤트 유형
 EVENTS = {
-    "intrusion_detection": "IDS 탐지",
-    "firewall_packet": "방화벽 패킷 기록",
-    "http_request": "HTTP 요청",
-    "http_timeout": "HTTP 요청 시간 초과",
-    "http_client_error": "HTTP 클라이언트 오류",
-    "http_server_error": "HTTP 서버 오류",
-    "apache_system_event": "Apache 시스템 이벤트",
-    "database_event": "데이터베이스 이벤트",
-    "database_startup": "데이터베이스 시작",
-    "database_system_warning": "데이터베이스 시스템 경고",
-    "authentication_failure": "인증 실패"
+    "intrusion_detection": "intrusion_detection",
+    "firewall_packet": "firewall_packet",
+    "http_request": "http_request",
+    "http_timeout": "http_timeout",
+    "http_client_error": "http_client_error",
+    "http_server_error": "http_server_error",
+    "apache_system_event": "apache_system_event",
+    "database_event": "database_event",
+    "database_startup": "database_startup",
+    "database_system_warning": "database_system_warning",
+    "authentication_failure": "authentication_failure"
 }
 
 
@@ -55,39 +55,39 @@ ASSETS = {
 DETAIL_SCHEMAS = {
 
     "snort": {
-        "signature_id": "시그니처ID",
-        "classification": "탐지분류",
-        "priority": "우선순위"
+        "signature_id": "signature_id",
+        "classification": "classification",
+        "priority": "priority"
     },
 
     "iptables": {
-        "interface_in": "입력인터페이스",
-        "interface_out": "출력인터페이스",
-        "packet_length": "패킷크기",
-        "ttl": "TTL",
-        "icmp_type": "ICMP유형",
-        "icmp_code": "ICMP코드",
-        "icmp_sequence": "ICMP순서번호",
-        "action": "처리결과"
+        "interface_in": "interface_in",
+        "interface_out": "interface_out",
+        "packet_length": "packet_length",
+        "ttl": "ttl",
+        "icmp_type": "icmp_type",
+        "icmp_code": "icmp_code",
+        "icmp_sequence": "icmp_sequence",
+        "action": "action"
     },
 
     "dvwa": {
-        "http_method": "HTTP메서드",
-        "http_path": "요청경로",
-        "http_version": "HTTP버전",
-        "http_status": "HTTP상태코드",
-        "response_size": "응답크기",
-        "referer": "참조URL",
-        "user_agent": "사용자에이전트",
-        "apache_module": "Apache모듈",
-        "apache_level": "Apache로그레벨"
+        "http_method": "http_method",
+        "http_path": "http_path",
+        "http_version": "http_version",
+        "http_status": "http_status",
+        "response_size": "response_size",
+        "referer": "referer",
+        "user_agent": "user_agent",
+        "apache_module": "apache_module",
+        "apache_level": "apache_level"
     },
 
     "mariadb": {
-        "thread_id": "스레드ID",
-        "database_level": "DB로그레벨",
-        "db_user": "DB사용자",
-        "client_host": "클라이언트호스트"
+        "thread_id": "thread_id",
+        "database_level": "database_level",
+        "db_user": "db_user",
+        "client_host": "client_host"
     }
 }
 
@@ -157,24 +157,24 @@ def normalize_log(
 ):
 
     if log_type not in DETAIL_SCHEMAS:
-        raise ValueError(f"지원하지 않는 로그 유형: {log_type}")
+        raise ValueError(f"Unsupported log type: {log_type}")
 
     if event_type not in EVENTS:
-        raise ValueError(f"지원하지 않는 이벤트 유형: {event_type}")
+        raise ValueError(f"Unsupported event type: {event_type}")
 
     event_time = to_kst(timestamp, log_type)
 
     time_source = (
-        "원본로그"
+        "raw_log"
         if event_time is not None
         else None
     )
 
     if log_type == "snort" and event_time:
-        time_source = "원본로그 및 연도추정"
+        time_source = "raw_log_inferred_year"
 
     destination_source = (
-        "원본로그"
+        "raw_log"
         if dst_ip is not None or dst_port is not None
         else None
     )
@@ -187,7 +187,7 @@ def normalize_log(
             dst_ip = ASSETS["dvwa"]["ip"]
             dst_port = ASSETS["dvwa"]["port"]
 
-            destination_source = "자산설정"
+            destination_source = "asset_config"
 
 
     # MariaDB 클라이언트 주소 처리
@@ -225,37 +225,37 @@ def normalize_log(
 
     return {
 
-        "스키마버전": "2.0",
-        "이벤트ID": str(uuid4()),
+        "schema_version": "3.0",
+        "event_id": str(uuid4()),
 
-        "발생시간": event_time,
-        "발생시간출처": time_source,
-        "로그기록시간": None,
-        "전달레코드시간": None,
+        "timestamp": event_time,
+        "timestamp_source": time_source,
+        "log_timestamp": None,
+        "forward_timestamp": None,
 
-        "정규화시간": datetime.now(KST).isoformat(
+        "normalized_at": datetime.now(KST).isoformat(
             timespec="microseconds"
         ),
 
-        "수집원": source_vm,
-        "수집태그": None,
+        "source_vm": source_vm,
+        "tag": None,
 
-        "로그유형": log_type,
-        "이벤트분류": EVENT_CATEGORIES[log_type],
-        "이벤트유형": EVENTS[event_type],
+        "log_type": log_type,
+        "event_category": EVENT_CATEGORIES[log_type],
+        "event_type": EVENTS[event_type],
 
         **severity_result,
 
-        "출발지IP": clean_ip(src_ip),
-        "출발지포트": clean_port(src_port),
+        "src_ip": clean_ip(src_ip),
+        "src_port": clean_port(src_port),
 
-        "목적지IP": clean_ip(dst_ip),
-        "목적지포트": clean_port(dst_port),
-        "목적지정보출처": destination_source,
+        "dst_ip": clean_ip(dst_ip),
+        "dst_port": clean_port(dst_port),
+        "destination_source": destination_source,
 
-        "프로토콜": protocol.upper() if protocol else None,
+        "protocol": protocol.upper() if protocol else None,
 
-        "메시지": message,
-        "상세정보": details,
-        "원본로그": raw
+        "message": message,
+        "details": details,
+        "raw": raw
     }

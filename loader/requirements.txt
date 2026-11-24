@@ -1,0 +1,6 @@
+cd ~/soc-lab/soc
+
+source .venv/bin/activate
+
+python -m pip freeze | grep -i '^PyMySQL==' \
+> loader/requirements.txt

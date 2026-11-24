@@ -51,7 +51,7 @@ def parse_iptables(raw_log):
         dst_port=number("DPT"),
         protocol=protocol,
 
-        message=f'{protocol or "미확인"} 패킷 기록',
+        message=f'{protocol or "unknown"} packet logged',
         raw=raw_log,
 
         interface_in=fields.get("IN"),

@@ -80,7 +80,7 @@ def extract_record(line):
         envelope = json.loads(match.group(2))
 
         if len(envelope) != 2:
-            raise ValueError("잘못된 Fluent Bit 레코드")
+            raise ValueError("Invalid Fluent Bit record")
 
         record["tag"] = match.group(1)
 
@@ -97,7 +97,7 @@ def extract_record(line):
         if isinstance(data, dict):
 
             if "log" not in data:
-                raise ValueError("log 필드 누락")
+                raise ValueError("Missing log field")
 
             timestamp = metadata_time(data.get("time"))
 
@@ -122,7 +122,7 @@ def extract_record(line):
 
             continue
 
-        raise ValueError("지원하지 않는 로그 데이터 형식")
+        raise ValueError("Unsupported log data format")
 
 
 # 기존 함수와의 호환성 유지
@@ -139,17 +139,17 @@ def exclusion_reason(raw_log):
         r"\[\s*(info|warn|error|debug|trace)\s*\]",
         raw_log
     ):
-        return "Fluent Bit 자체 운영 로그"
+        return "Fluent Bit internal log"
 
     if (
         " sudo:" in raw_log
         and "COMMAND=" in raw_log
         and "IPTABLES:" in raw_log
     ):
-        return "iptables 관련 sudo 명령 기록"
+        return "iptables-related sudo command log"
 
     if not raw_log.strip():
-        return "빈 로그"
+        return "Empty log"
 
     return None
 
@@ -186,27 +186,27 @@ def process_log(raw_log, reference_time=None):
 # 메타데이터 보완
 def enrich_record(result, record):
 
-    result["로그기록시간"] = record["docker_time"]
+    result["log_timestamp"] = record["docker_time"]
 
-    result["전달레코드시간"] = record["forward_time"]
+    result["forward_timestamp"] = record["forward_time"]
 
-    result["수집태그"] = record["tag"]
+    result["tag"] = record["tag"]
 
 
     # 원본에 발생시간이 없는 경우 Docker 시간 사용
-    if result["발생시간"] is None:
+    if result["timestamp"] is None:
 
         if record["docker_time"]:
 
-            result["발생시간"] = record["docker_time"]
+            result["timestamp"] = record["docker_time"]
 
-            result["발생시간출처"] = "Docker 기록시간"
+            result["timestamp_source"] = "docker_log_time"
 
         elif record["forward_time"]:
 
-            result["발생시간"] = record["forward_time"]
+            result["timestamp"] = record["forward_time"]
 
-            result["발생시간출처"] = "Fluent Bit 이벤트시간"
+            result["timestamp_source"] = "fluent_bit_event_time"
 
     return result
 
@@ -270,12 +270,12 @@ def handle_log(line):
         if reason:
 
             save_json(EXCLUDED_FILE, {
-                "원본로그": raw_log,
-                "제외사유": reason,
-                "입력레코드": line.strip()
+                "raw": raw_log,
+                "reason": reason,
+                "input_record": line.strip()
             })
 
-            print(f"[제외] {reason}", flush=True)
+            print(f"[EXCLUDED] {reason}", flush=True)
             return
 
 
@@ -285,23 +285,23 @@ def handle_log(line):
         if result is None:
 
             save_json(FAILED_FILE, {
-                "원본로그": raw_log,
-                "실패사유": "지원하지 않는 로그 형식",
-                "입력레코드": line.strip()
+                "raw": raw_log,
+                "reason": "Unsupported log format",
+                "input_record": line.strip()
             })
 
-            print("[미분류] 로그 형식 미확인", flush=True)
+            print("[UNPARSED] Unknown log format", flush=True)
             return
 
 
         save_json(OUTPUT_FILE, result)
 
         print(
-            f"[정규화 완료] "
-            f"{result['수집원']} | "
-            f"{result['로그유형']} | "
-            f"{result['이벤트유형']} | "
-            f"{result['심각도']}",
+            f"[NORMALIZED] "
+            f"{result['source_vm']} | "
+            f"{result['log_type']} | "
+            f"{result['event_type']} | "
+            f"{result['severity']}",
             flush=True
         )
 
@@ -309,12 +309,12 @@ def handle_log(line):
     except Exception as error:
 
         save_json(FAILED_FILE, {
-            "원본로그": raw_log,
-            "실패사유": str(error),
-            "입력레코드": line.strip()
+            "raw": raw_log,
+            "reason": str(error),
+            "input_record": line.strip()
         })
 
-        print(f"[오류] {error}", flush=True)
+        print(f"[ERROR] {error}", flush=True)
 
 
 # 실시간 정규화 엔진
@@ -325,20 +325,20 @@ def main():
     parser.add_argument(
         "--from-start",
         action="store_true",
-        help="원본 로그의 처음부터 처리"
+        help="Process logs from the beginning"
     )
 
     parser.add_argument(
         "--once",
         action="store_true",
-        help="현재 로그 처리 후 종료"
+        help="Process current logs and exit"
     )
 
     args = parser.parse_args()
 
-    print("[시작] SOC 로그 정규화 엔진", flush=True)
-    print(f"[입력] {INPUT_FILE}", flush=True)
-    print(f"[출력] {OUTPUT_FILE}", flush=True)
+    print("[START] SOC Log Normalizer", flush=True)
+    print(f"[INPUT] {INPUT_FILE}", flush=True)
+    print(f"[OUTPUT] {OUTPUT_FILE}", flush=True)
 
     while not INPUT_FILE.exists():
 
@@ -377,4 +377,4 @@ if __name__ == "__main__":
         main()
 
     except KeyboardInterrupt:
-        print("\n[종료] SOC 로그 정규화 엔진")
+        print("\n[STOP] SOC Log Normalizer")

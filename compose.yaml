@@ -3,6 +3,8 @@ services:
   db:
     image: mariadb:10
     container_name: soc-db
+    ports:
+      - "127.0.0.1:13306:3306"
     environment:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: socdb

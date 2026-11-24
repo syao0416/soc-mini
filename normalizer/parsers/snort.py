@@ -35,7 +35,7 @@ def parse_snort_time(value, reference_time=None):
             continue
 
     if not candidates:
-        raise ValueError("Snort 발생시간 변환 실패")
+        raise ValueError("Failed to parse Snort timestamp")
 
     nearest = min(
         candidates,
