@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 
 .vercel
+.env
+.venv/
+**/__pycache__/
+*.pyc
+*.sqlite3
+*.before-login.bak

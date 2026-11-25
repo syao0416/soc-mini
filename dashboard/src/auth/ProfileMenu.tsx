@@ -1,0 +1,35 @@
+import { useState } from 'react'
+import { UserManagement } from './UserManagement'
+import { ChevronDown, LogOut, ShieldCheck, UserRound } from 'lucide-react'
+import { useAuth } from './AuthProvider'
+
+export function ProfileMenu() {
+  const { user, signOut } = useAuth()
+  const [open, setOpen] = useState(false)
+  const [adminOpen, setAdminOpen] = useState(false)
+  const [error, setError] = useState('')
+
+  async function handleLogout() {
+    setError('')
+    try { await signOut() }
+    catch (err) { setError(err instanceof Error ? err.message : '로그아웃에 실패했어요.') }
+  }
+
+  return (
+    <div className="soc-profile">
+      <button className="soc-profile-trigger" type="button" onClick={() => setOpen(value => !value)} aria-expanded={open} aria-haspopup="menu">
+        <span className="soc-profile-avatar">{user.username.slice(0, 2).toUpperCase()}</span>
+        <span className="soc-profile-label"><strong>{user.username}</strong><small>{user.role === 'admin' ? '관리자' : '관제 요원'}</small></span>
+        <ChevronDown size={15}/>
+      </button>
+      {open && <div className="soc-profile-dropdown" role="menu">
+        <div className="soc-profile-row"><UserRound size={16}/><span>{user.username}</span></div>
+        <div className="soc-profile-row"><ShieldCheck size={16}/><span>{user.role === 'admin' ? '관리자 권한' : '관제 요원 권한'}</span></div>
+        {user.role === 'admin' && <button type="button" role="menuitem" className="soc-profile-manage" onClick={() => { setOpen(false); setAdminOpen(true) }}><ShieldCheck size={16}/> 사용자 관리</button>}
+        {error && <p className="soc-auth-error">{error}</p>}
+        <button type="button" role="menuitem" className="soc-profile-logout" onClick={handleLogout}><LogOut size={16}/> 로그아웃</button>
+      </div>}
+      {adminOpen && <UserManagement onClose={() => setAdminOpen(false)} />}
+    </div>
+  )
+}

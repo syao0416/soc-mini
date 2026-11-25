@@ -1,3 +1,4 @@
+import { ProfileMenu } from './auth/ProfileMenu'
 import { useEffect, useMemo, useState, type ReactNode, type CSSProperties } from 'react'
 import {
   Activity, AlertCircle, ArrowDownToLine, ArrowRight, Bell, CheckCircle2, ChevronDown,
@@ -147,7 +148,7 @@ function App(){
     </aside>
     <header className="topbar">
       <div className="topbar-start"><button onClick={()=>setDrawerOpen(true)} className="menu-toggle" aria-label="메뉴 열기"><Menu size={26}/></button><div className="wordmark">MINI<span>SOC</span></div><span className="topbar-sep"/><span className="topbar-label">{selectedTitle}</span></div>
-      <div className="topbar-right"><span className="demo-chip"><span className="pulse-dot"/> DEMO DATA</span><button className="icon-btn notifications" title="신규 Alert 확인" onClick={()=>selectPage('alerts')} aria-label="경고 관리 열기"><Bell size={20}/>{newCount>0&&<em>{newCount}</em>}</button><span className="avatar">SC</span></div>
+      <div className="topbar-right"><span className="demo-chip"><span className="pulse-dot"/> DEMO DATA</span><button className="icon-btn notifications" title="신규 Alert 확인" onClick={()=>selectPage('alerts')} aria-label="경고 관리 열기"><Bell size={20}/>{newCount>0&&<em>{newCount}</em>}</button><ProfileMenu /></div>
     </header>
     <main className="page-wrap">
       {page==='dashboard'&&<>
