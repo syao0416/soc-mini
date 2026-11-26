@@ -1,0 +1,8 @@
+-- TEMPLATE ONLY - run ON VM4 through the trusted VM4 DBA/administrator account.
+-- MariaDB users/host permissions must match the Docker network source.
+-- Do not paste secrets in chat, GitHub, or command history.
+-- Example host entry. Replace 192.168.56.% with the true source/transport policy.
+-- CREATE USER 'soc_viewer'@'192.168.56.%' IDENTIFIED BY 'SECURE_PASSWORD_GENERATED_ON_VM4';
+-- GRANT SELECT ON socdb.events TO 'soc_viewer'@'192.168.56.%';
+-- SHOW GRANTS FOR 'soc_viewer'@'192.168.56.%';
+-- Note: SSH tunnel from inside VM4 may connect as localhost instead. Coordinate exact host rule with DBA.

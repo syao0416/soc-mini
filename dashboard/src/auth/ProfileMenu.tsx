@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { UserManagement } from './UserManagement'
 import { ChevronDown, LogOut, ShieldCheck, UserRound } from 'lucide-react'
-import { useAuth } from './AuthProvider'
+import { useAuth } from './AuthContext'
 
 export function ProfileMenu() {
   const { user, signOut } = useAuth()

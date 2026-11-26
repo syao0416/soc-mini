@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { Check, KeyRound, RefreshCw, Search, ShieldCheck, UserPlus, Users, X } from 'lucide-react'
-import { useAuth } from './AuthProvider'
+import { useAuth } from './AuthContext'
 import { createUser, listUsers, resetPassword, updateUser, type ManagedUser } from './adminApi'
 import './user-management.css'
 
@@ -25,7 +25,14 @@ export function UserManagement({ onClose }: { onClose: () => void }) {
     finally { setLoading(false) }
   }, [])
 
-  useEffect(() => { void refresh() }, [refresh])
+  useEffect(() => {
+    let active = true
+    listUsers()
+      .then(result => { if (active) { setUsers(result); setError('') } })
+      .catch(ex => { if (active) setError(ex instanceof Error ? ex.message : '사용자를 불러오지 못했습니다.') })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [])
   useEffect(() => {
     const keydown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', keydown)

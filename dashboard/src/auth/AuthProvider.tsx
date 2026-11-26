@@ -1,10 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
-import { getCurrentUser, loginUser, logoutUser, type AuthUser } from './api'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { getCurrentUser, loginUser, logoutUser } from './api'
 import { LoginScreen } from './LoginScreen'
+import { AuthContext } from './AuthContext'
 import './auth.css'
+import type { AuthUser } from './api'
 
-type AuthContextValue = { user: AuthUser; signOut: () => Promise<void> }
-const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
@@ -15,7 +15,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let live = true
     getCurrentUser()
       .then((current) => { if (live) setUser(current) })
-      .catch(() => { if (live) setError('Django API에 연결되지 않았어요. Docker 컨테이너를 확인해 줘.') })
+      .catch(() => { if (live) setError('Django API에 연결되지 않았어요. Docker 컨테이너를 확인해 주세요.') })
       .finally(() => { if (live) setChecking(false) })
     return () => { live = false }
   }, [])
@@ -36,8 +36,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={{ user, signOut }}>{children}</AuthContext.Provider>
 }
 
-export function useAuth() {
-  const value = useContext(AuthContext)
-  if (!value) throw new Error('useAuth는 AuthProvider 안에서 사용해야 합니다.')
-  return value
-}

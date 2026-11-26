@@ -30,3 +30,22 @@ dist-ssr
 *.pyc
 *.sqlite3
 *.before-login.bak
+
+local-data/
+
+*.before-events.bak
+
+local-backups/
+
+# VIOLET SOC integration sensitive local files
+.env
+.env.*
+!.env.example
+!.env.integration.example
+local-data/
+local-backups/
+*.pyc
+__pycache__/
+*.pem
+*.key
+vm2-agent/receipts/
