@@ -85,7 +85,7 @@ export function SocSettings() {
     {config && <div className="soc-settings-grid">
       <section className="glass-card soc-settings-card">
         <div className="card-title-row"><h3><Activity size={17}/> 시스템 연결 확인</h3></div>
-        <p className="soc-settings-help">실제 SOC 로그 조회 API가 정상 동작하는지 확인합니다. 데이터베이스의 로그를 수정하지 않습니다.</p>
+        <p className="soc-settings-help">실제 SOC 로그 조회 API가 정상 동작하는지 확인합니다.</p>
         <div className="soc-setting-info"><span>현재 연결</span><strong>{dbStatus}</strong></div>
         <button type="button" className="line-button" onClick={()=>void fetch('/api/events/stats/',{credentials:'same-origin'}).then(r=>{if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json()}).then(d=>setDbStatus(`정상 · 이벤트 ${d.total_events}건`)).catch(()=>setDbStatus('연결 실패'))}><Activity size={16}/> DB 연결 확인</button>
         
@@ -107,11 +107,11 @@ export function SocSettings() {
         <label className="soc-setting-field">테스트 메일 수신자
           <input type="email" value={testRecipient} onChange={e=>setTestRecipient(e.target.value)} placeholder="test@example.com"/></label>
         <button className="line-button" type="button" disabled={saving || !config.smtp_configured} onClick={()=>void test()}><Mail size={16}/> 테스트 메일 발송</button>
-        <p className="soc-settings-help">자동 알림은 신규 DB 이벤트를 조회하는 서버 명령을 실행해야 발송됩니다. 기존 367건은 최초 활성화 시 발송 대상에서 제외됩니다.</p>
+        <p className="soc-settings-help">자동 알림은 신규 DB 이벤트를 조회하는 서버 명령을 실행해야 발송됩니다. </p>
       </section>
       <section className="glass-card soc-settings-card">
         <div className="card-title-row"><h3><ShieldAlert size={17}/> IP 차단 검토 정책</h3></div>
-        <p className="soc-settings-help">관리자가 보호 IP 대역을 지정할 수 있습니다. 현재 기능은 차단 가능 여부 확인과 기존 승인 기록까지이며 실제 방화벽 명령을 실행하지 않습니다.</p>
+        <p className="soc-settings-help">관리자가 보호 IP 대역을 지정할 수 있습니다. </p>
         <div className="soc-setting-info"><span>실제 방화벽 차단</span><strong>연결되지 않음</strong></div>
         <div className="soc-setting-info"><span>실제 차단 승인 정책</span><strong>관리자 승인 필수</strong></div>
         <label className="soc-setting-field">보호 IP/CIDR (한 줄에 하나)

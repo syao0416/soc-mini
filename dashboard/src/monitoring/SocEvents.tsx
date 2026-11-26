@@ -123,13 +123,13 @@ export function SocEvents() {
     } catch (e) { setError(String(e)) } finally { setBusy(false) }
   }
   const createResponse = async () => {
-    if (!selected?.src_ip) { setError('이벤트에 출발지 IP가 없어.'); return }
-    if (!window.confirm(`${selected.src_ip} 차단 검토를 요청할까요? 실제 차단은 실행되지 않습니다.`)) return
+    if (!selected?.src_ip) { setError('이벤트에 출발지 IP가 없습니다.'); return }
+    if (!window.confirm(`${selected.src_ip} 차단 검토를 요청할까요? `)) return
     setBusy(true)
     try {
       await post('/api/responses/', { event_id: selected.event_id, target_ip: selected.src_ip, action: 'block', reason: note || selected.message || '관제 검토' })
       await load()
-      setFeedback('차단 검토 요청이 MariaDB에 저장됐습니다. 실제 방화벽은 변경되지 않았습니다.')
+      setFeedback('차단 검토 요청이 MariaDB에 저장됐습니다.')
     } catch (e) { setError(String(e)) } finally { setBusy(false) }
   }
   const decide = async (id: number, decision: 'approved' | 'rejected') => {
@@ -137,7 +137,7 @@ export function SocEvents() {
     try {
       await post(`/api/responses/${id}/decision/`, { decision })
       await load()
-      setFeedback('승인·반려 이력이 저장됐습니다. 실제 방화벽 명령은 실행되지 않았습니다.')
+      setFeedback('승인·반려 이력이 저장됐습니다. ')
     } catch (e) { setError(String(e)) } finally { setBusy(false) }
   }
   return <div className="soc-events-page">
@@ -187,7 +187,7 @@ export function SocEvents() {
       </section>
     </div>
     <section className="soc-events-card">
-      <h2>차단 검토 및 승인 이력 (실제 방화벽 변경 없음)</h2>
+      <h2>차단 검토 및 승인 이력 </h2>
       <div className="soc-events-overflow"><table><thead><tr><th>요청 ID</th><th>출발지 IP</th><th>조치</th><th>상태</th><th>요청자</th><th>검토</th></tr></thead><tbody>
         {responses.map(r => <tr key={r.id}><td>{r.id}</td><td>{r.target_ip}</td><td>{r.action}</td><td>{r.status}</td><td>{r.created_by}</td><td>{r.status === 'pending' && user.role === 'admin' ? <span className="soc-event-actions"><button disabled={busy} onClick={() => void decide(r.id, 'approved')}>승인</button><button disabled={busy} onClick={() => void decide(r.id, 'rejected')}>반려</button></span> : '—'}</td></tr>)}
       </tbody></table></div>

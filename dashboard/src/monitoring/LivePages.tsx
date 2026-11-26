@@ -1,3 +1,4 @@
+import { ReputationVisuals } from './ReputationVisuals'
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import {
   Activity, AlertCircle, ArrowDownToLine, ArrowRight, CheckCircle2, ChevronDown, Clock3,
@@ -161,7 +162,7 @@ function EventsTable({rows,onSelect,limit}:{rows:SocEvent[];onSelect:(id:string)
       <h3>분석 및 처리</h3><label className="field-label">처리 상태<select className="field-input" value={status} onChange={e=>setStatus(e.target.value as ReviewStatus)}>{statuses.map(v=><option key={v} value={v}>{statusLabel(v)}</option>)}</select></label>
       <label className="field-label">분석 메모<textarea className="field-input note-area" maxLength={2000} value={note} onChange={e=>setNote(e.target.value)} placeholder="분석 근거와 판단 사항을 기록"/></label>
       <div className="detail-actions"><button disabled={busy} className="solid-button" onClick={()=>void save()}><CheckCircle2 size={17}/> DB 저장</button><button disabled={busy||!detail.src_ip} className="line-button" onClick={()=>void block()}><Lock size={17}/> 차단 검토 요청</button></div>
-      <p className="fine-note">처리 정보는 Django DB에 기록되며, 실제 IP 차단·해제는 실행되지 않습니다.</p>
+    
     </>}
   </aside></>
 }
@@ -176,7 +177,7 @@ export function LiveDashboard({goTo}:{goTo:GoTo}) {
   return <>
     <div className="hero-title"><div><div className="eyebrow wide">MONITORING DATABASE</div><h1>Security <span>&amp;</span><br/>Threat Intelligence</h1></div><div className="hero-right"><div className="hero-icon"><ShieldCheck size={42}/></div><span>DATA SOURCE</span><strong>DB SNAPSHOT</strong><small></small></div></div>
     <ErrorNotice message={error}/>
-    {capped&&<Hint>분석 대상이 2,000건을 초과하여 최신 2,000건만 그래프 및 검토 상태 집계에 사용되었습니다. 전체 이벤트 수는 DB 통계입니다.</Hint>}d
+    {capped&&<Hint>전체 이벤트 수는 DB 통계입니다.</Hint>}
     <div className="kpi-strip">
       {[
         {label:'COLLECTED EVENTS',value:stats?.total_events,icon:HardDrive,sub:'socdb.events 전체 행 수'},
@@ -254,7 +255,6 @@ export function LiveLogs() {
   const searchNow=()=>{setSelected(null);setPage(0);setLoading(true);setQuery(term)}
   return <>
     <Section eyebrow="EVENT INVESTIGATION / MARIA DB" title="Log Management" aside={<Pill color="#d8cdff">{total} RECORDS</Pill>}/>
-    <Hint>페이지당 50건씩 조회하며 원본 로그는 행을 클릭할 때 별도로 불러옵니다.</Hint>
     <ErrorNotice message={error}/>
     <div className="toolbar glass-card"><div className="searchbox"><Search size={18}/><input placeholder="출발지·목적지 IP, 로그 내용, 이벤트 유형" value={term} onChange={e=>setTerm(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')searchNow()}}/><button className="live-inline-button" onClick={searchNow}>검색</button></div><label className="selectbox"><SlidersHorizontal size={16}/><select style={selectStyle} value={kind} onChange={e=>{setKind(e.target.value);setPage(0);setSelected(null);setLoading(true)}}><option value="">전체 로그</option>{categories.map(s=><option key={s}>{s}</option>)}</select></label><button className="live-refresh" onClick={()=>void load()}><RefreshCw size={15}/> 새로고침</button></div>
     <Panel title="Collected Logs" aside={<Pill color="#d8cdff">{total} DB EVENTS</Pill>}>
@@ -307,15 +307,93 @@ export function LiveResponses() {
   </>
 }
 
-export function LiveReputation({goTo}:{goTo:GoTo}) {
-  const {rows,error,loading,capped}=useSnapshot()
-  const [ip,setIp]=useState('');const [checked,setChecked]=useState<string|null>(null)
-  const matching=useMemo(()=>rows.filter(e=>e.src_ip===checked||e.dst_ip===checked),[checked,rows])
-  return <><Section eyebrow="LOCAL INDICATOR SEARCH" title="IP Reputation"/><ErrorNotice message={error}/>
-    <Panel title="Local IP Lookup"><div className="ip-lookup"><div className="searchbox"><Globe2 size={22}/><input value={ip} onChange={e=>setIp(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')setChecked(ip.trim())}} placeholder="로그의 IPv4 또는 IPv6 주소 검색"/></div><button className="solid-button" onClick={()=>setChecked(ip.trim())}><Search size={18}/> 로컬 로그 조회</button></div>
-      {checked!==null&&<div className="ip-result"><div><span className="micro-label">LOCAL EVIDENCE RESULT</span><h3>{checked||'IP를 입력해 줘'}</h3></div><Pill color="#ffddb3">외부 악성 평판 미조회</Pill><p>일치하는 수집 이벤트: <strong>{loading?'조회 중':matching.length}건</strong> ({capped?'최신 2,000건 기준':'현재 DB 스냅샷 기준'})</p><p>수집 로그에 등장했다는 사실만으로 공격 주체로 판단할 수 없습니다.</p>{matching.length>0&&<button className="text-link" onClick={()=>goTo('alerts')}>Alert Management에서 분석하기 <ArrowRight size={15}/></button>}</div>}
-    </Panel></>
+export function LiveReputation({ goTo }: { goTo: GoTo }) {
+  const { rows, error, loading, capped } = useSnapshot()
+
+  const [ip, setIp] = useState('')
+  const [checked, setChecked] = useState<string | null>(null)
+
+  const matching = useMemo(
+    () => rows.filter(e => e.src_ip === checked || e.dst_ip === checked),
+    [checked, rows]
+  )
+
+  return (
+    <>
+      <Section
+        eyebrow="LOCAL INDICATOR SEARCH"
+        title="IP Reputation"
+      />
+
+      <ErrorNotice message={error} />
+
+      <Panel title="Local IP Lookup">
+        <div className="ip-lookup">
+          <div className="searchbox">
+            <Globe2 size={22} />
+            <input
+              value={ip}
+              onChange={e => setIp(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') setChecked(ip.trim())
+              }}
+              placeholder="로그의 IPv4 또는 IPv6 주소 검색"
+            />
+          </div>
+
+          <button
+            className="solid-button"
+            onClick={() => setChecked(ip.trim())}
+          >
+            <Search size={18} />
+            로컬 로그 조회
+          </button>
+        </div>
+
+        {checked !== null && (
+          <div className="ip-result">
+            <div>
+              <span className="micro-label">LOCAL EVIDENCE RESULT</span>
+              <h3>{checked || 'IP를 입력해 주세요'}</h3>
+            </div>
+
+            <Pill color="#ffddb3">외부 악성 평판 미조회</Pill>
+
+            <p>
+              일치하는 수집 이벤트:
+              <strong>{loading ? '조회 중' : matching.length}건</strong>
+              ({capped ? '최신 2,000건 기준' : '현재 DB 스냅샷 기준'})
+            </p>
+
+            <p>
+              수집 로그에 등장했다는 사실만으로 공격 주체로
+              판단할 수 없습니다.
+            </p>
+
+            {matching.length > 0 && (
+              <button
+                className="text-link"
+                onClick={() => goTo('alerts')}
+              >
+                Alert Management에서 분석하기
+                <ArrowRight size={15} />
+              </button>
+            )}
+          </div>
+        )}
+      </Panel>
+
+      {/* 새로 추가한 IP 분석 및 지도 화면 */}
+      <ReputationVisuals
+        events={rows}
+        selectedIp={checked}
+        capped={capped}
+        onOpenAlerts={() => goTo('alerts')}
+      />
+    </>
+  )
 }
+
 function downloadMarkdown(content:string){
   const file=new Blob([content],{type:'text/markdown;charset=utf-8'})
   const url=URL.createObjectURL(file)
