@@ -24,9 +24,9 @@ export function LoginScreen({ onLogin, serverError }: Props) {
   return (
     <div className="soc-auth-page">
       <main className="soc-auth-card">
-        <div className="soc-auth-brand"><span className="soc-auth-brand-icon"><ShieldCheck size={25} /></span><span>VIOLET <strong>SOC</strong></span></div>
+        <div className="soc-auth-brand"><span className="soc-auth-brand-icon"><ShieldCheck size={25} /></span><span><strong>JIKIMI</strong></span></div>
         <div className="soc-auth-kicker">SECURITY OPERATIONS CENTER</div>
-        <h1>Welcome back</h1>
+        <h1>LOGIN</h1>
         <p className="soc-auth-description">관제 요원 계정으로 로그인해 주세요.</p>
         <form onSubmit={submit} className="soc-auth-form">
           <label htmlFor="soc-user"><UserRound size={17} /> 사용자 ID</label>
@@ -36,7 +36,7 @@ export function LoginScreen({ onLogin, serverError }: Props) {
           {(error || serverError) && <p className="soc-auth-error" role="alert">{error || serverError}</p>}
           <button className="soc-auth-submit" type="submit" disabled={busy}>{busy ? '로그인 중...' : 'SOC 대시보드 로그인'}</button>
         </form>
-        <p className="soc-auth-note">관리자가 발급한 계정만 이용할 수 있습니다. 현재는 로컬 개발 환경입니다.</p>
+        <p className="soc-auth-note">관리자가 발급한 계정만 이용할 수 있습니다.</p>
       </main>
     </div>
   )

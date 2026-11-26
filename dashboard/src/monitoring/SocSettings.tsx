@@ -78,7 +78,7 @@ export function SocSettings() {
   return <>
     <div className="section-header"><div><div className="eyebrow">SECURITY OPERATIONS / SERVER CONFIG</div><h2>Settings</h2></div>
       <button className="line-button" type="button" onClick={()=>void refresh()}><RefreshCw size={15}/> 새로고침</button></div>
-    <div className="notice-box"><AlertCircle size={17}/><span>설정은 관리자 계정에서만 변경할 수 있습니다. SMTP 비밀번호는 화면이나 DB에 저장하지 않고 서버 환경변수로 관리합니다. 방화벽 실제 차단은 VM2 연결 전까지 비활성화되어 있습니다.</span></div>
+    <div className="notice-box"><AlertCircle size={17}/><span>설정은 관리자 계정에서만 변경할 수 있습니다. SMTP 비밀번호는 화면이나 DB에 저장하지 않고 서버 환경변수로 관리합니다. </span></div>
     {error && <p className="soc-setting-error" role="alert">{error}</p>}
     {notice && <p className="soc-setting-success" role="status"><CheckCircle2 size={16}/>{notice}</p>}
     {loading && <p>서버 설정을 조회하고 있습니다…</p>}
@@ -88,7 +88,7 @@ export function SocSettings() {
         <p className="soc-settings-help">실제 SOC 로그 조회 API가 정상 동작하는지 확인합니다. 데이터베이스의 로그를 수정하지 않습니다.</p>
         <div className="soc-setting-info"><span>현재 연결</span><strong>{dbStatus}</strong></div>
         <button type="button" className="line-button" onClick={()=>void fetch('/api/events/stats/',{credentials:'same-origin'}).then(r=>{if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json()}).then(d=>setDbStatus(`정상 · 이벤트 ${d.total_events}건`)).catch(()=>setDbStatus('연결 실패'))}><Activity size={16}/> DB 연결 확인</button>
-        <p className="soc-settings-help">VM4 실시간 연동은 네트워크 연결과 전용 읽기 계정이 준비된 후 서버의 SOC_LOGS_* 설정으로 연결합니다.</p>
+        
       </section>
       <section className="glass-card soc-settings-card">
         <div className="card-title-row"><h3><Mail size={17}/> SMTP 및 알림 메일</h3></div>

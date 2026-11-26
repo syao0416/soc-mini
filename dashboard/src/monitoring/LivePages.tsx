@@ -90,7 +90,7 @@ function CountTrend({rows,period}:{rows:SocEvent[];period:Period}) {
   const coords=counts.map((n,i)=>[42+i*728/Math.max(1,counts.length-1),210-n/max*155] as const)
   const path=coords.map(([x,y],i)=>`${i?'L':'M'}${x.toFixed(2)},${y.toFixed(2)}`).join(' ')
   return <div className="chart-holder">
-    {keys.length===0 ? <p className="live-empty">발생 시간 정보가 없어 추이를 표시할 수 없어.</p> : <svg viewBox="0 0 810 250" preserveAspectRatio="none" role="img" aria-label="수집된 이벤트 발생 추이">
+    {keys.length===0 ? <p className="live-empty">발생 시간 정보가 없어 추이를 표시할 수 없습니다.</p> : <svg viewBox="0 0 810 250" preserveAspectRatio="none" role="img" aria-label="수집된 이벤트 발생 추이">
       <defs><linearGradient id="liveLineShade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#d6ceff" stopOpacity=".35"/><stop offset="1" stopColor="#d6ceff" stopOpacity="0"/></linearGradient></defs>
       {[55,107,158,210].map(y=><line key={y} x1="42" x2="772" y1={y} y2={y} stroke="#d7d5ff" strokeOpacity=".18" strokeDasharray="3 7"/>) }
       {[0,1,2,3].map(i=><text key={i} x="31" y={59+i*51} textAnchor="end" fill="#c4baf4" fontSize="11">{Math.round(max*(3-i)/3)}</text>)}
@@ -115,9 +115,8 @@ function SeverityDonut({stats}:{stats:SocStats}) {
 function EventsTable({rows,onSelect,limit}:{rows:SocEvent[];onSelect:(id:string)=>void;limit?:number}) {
   return <div className="table-scroller"><table className="data-table"><thead><tr><th>DB 발생 시간</th><th>탐지 메시지</th><th>로그 종류</th><th>출발지 IP</th><th>위험도</th><th>상태</th></tr></thead><tbody>
     {rows.slice(0,limit).map(e=><tr key={e.event_id} tabIndex={0} role="button" className="interactive-row" onClick={()=>onSelect(e.event_id)} onKeyDown={ev=>{if(ev.key==='Enter')onSelect(e.event_id)}}><td className="mono muted">{dateText(e.event_time)}</td><td><strong className="live-event-title">{eventTitle(e)}</strong><small>{e.event_id.slice(0,8)} · {e.event_type}</small></td><td><span className="source-dot" style={{background:typeColor(e.log_type)}}/>{e.log_type}</td><td className="mono">{e.src_ip??'—'}</td><td><Pill color={riskColor(e.severity)}>{e.severity}</Pill></td><td><span className={`status ${e.review_status==='new'?'new':''}`}>{statusLabel(e.review_status)}</span></td></tr>)}
-  </tbody></table>{rows.length===0&&<div className="empty-state">조건에 맞는 이벤트가 없어.</div>}</div>
-}
-function DetailDrawer({eventId,onClose,onSaved,onResponse}:{eventId:string|null;onClose:()=>void;onSaved:()=>void;onResponse:()=>void}) {
+  </tbody></table>{rows.length===0&&<div className="empty-state">조건에 맞는 이벤트가 없습니다.</div>}</div>
+}function DetailDrawer({eventId,onClose,onSaved,onResponse}:{eventId:string|null;onClose:()=>void;onSaved:()=>void;onResponse:()=>void}) {
   const [detail,setDetail] = useState<SocEventDetail|null>(null)
   const [status,setStatus] = useState<ReviewStatus>('new')
   const [note,setNote] = useState('')
@@ -142,12 +141,12 @@ function DetailDrawer({eventId,onClose,onSaved,onResponse}:{eventId:string|null;
     } catch(e){setError(String(e))} finally{setBusy(false)}
   }
   const block=async()=>{
-    if(!detail?.src_ip){setError('이 이벤트에는 출발지 IP가 없어.');return}
-    if(!window.confirm(`${detail.src_ip} 차단 검토 요청을 남길까? 실제 차단 명령은 실행되지 않아.`))return
+    if(!detail?.src_ip){setError('이 이벤트에는 출발지 IP가 없습니다.');return}
+    if(!window.confirm(`${detail.src_ip} 차단 검토 요청을 남길까요? 실제 차단 명령은 실행되지 않습니다.`))return
     setBusy(true);setError('')
     try{
       await requestBlock(detail.event_id, detail.src_ip, note||eventTitle(detail))
-      setFeedback('차단 검토 요청이 DB에 기록됐어. 실제 방화벽은 변경되지 않았어.');onResponse()
+      setFeedback('차단 검토 요청이 DB에 기록되었습니다. 실제 방화벽은 변경되지 않았습니다.');onResponse()
     }catch(e){setError(String(e))}finally{setBusy(false)}
   }
   return <><button className="detail-backdrop" aria-label="이벤트 상세 닫기" onClick={onClose}/><aside className="detail-drawer" role="dialog" aria-modal="true" aria-label="실제 이벤트 상세">
@@ -162,7 +161,7 @@ function DetailDrawer({eventId,onClose,onSaved,onResponse}:{eventId:string|null;
       <h3>분석 및 처리</h3><label className="field-label">처리 상태<select className="field-input" value={status} onChange={e=>setStatus(e.target.value as ReviewStatus)}>{statuses.map(v=><option key={v} value={v}>{statusLabel(v)}</option>)}</select></label>
       <label className="field-label">분석 메모<textarea className="field-input note-area" maxLength={2000} value={note} onChange={e=>setNote(e.target.value)} placeholder="분석 근거와 판단 사항을 기록"/></label>
       <div className="detail-actions"><button disabled={busy} className="solid-button" onClick={()=>void save()}><CheckCircle2 size={17}/> DB 저장</button><button disabled={busy||!detail.src_ip} className="line-button" onClick={()=>void block()}><Lock size={17}/> 차단 검토 요청</button></div>
-      <p className="fine-note">처리 정보는 Django DB에 기록되며, 실제 IP 차단·해제는 실행되지 않아.</p>
+      <p className="fine-note">처리 정보는 Django DB에 기록되며, 실제 IP 차단·해제는 실행되지 않습니다.</p>
     </>}
   </aside></>
 }
@@ -175,9 +174,9 @@ export function LiveDashboard({goTo}:{goTo:GoTo}) {
   const risk=rows.filter(e=>e.severity_level>=2).length
   const recent=rows.slice(0,5)
   return <>
-    <div className="hero-title"><div><div className="eyebrow wide">MONITORING / REAL DATABASE</div><h1>Security <span>&amp;</span><br/>Threat Intelligence</h1><p>팀 VM4에서 수집한 이벤트를 로컬 MariaDB 스냅샷으로 분석해.</p></div><div className="hero-right"><div className="hero-icon"><ShieldCheck size={42}/></div><span>DATA SOURCE</span><strong>LOCAL DB SNAPSHOT</strong><small>실시간 수집·장비 상태 표시가 아님</small></div></div>
+    <div className="hero-title"><div><div className="eyebrow wide">MONITORING DATABASE</div><h1>Security <span>&amp;</span><br/>Threat Intelligence</h1></div><div className="hero-right"><div className="hero-icon"><ShieldCheck size={42}/></div><span>DATA SOURCE</span><strong>DB SNAPSHOT</strong><small></small></div></div>
     <ErrorNotice message={error}/>
-    {capped&&<Hint>분석 대상이 2,000건을 초과하여 최신 2,000건만 그래프 및 검토 상태 집계에 사용했어. 전체 이벤트 수는 DB 통계야.</Hint>}
+    {capped&&<Hint>분석 대상이 2,000건을 초과하여 최신 2,000건만 그래프 및 검토 상태 집계에 사용되었습니다. 전체 이벤트 수는 DB 통계입니다.</Hint>}d
     <div className="kpi-strip">
       {[
         {label:'COLLECTED EVENTS',value:stats?.total_events,icon:HardDrive,sub:'socdb.events 전체 행 수'},
@@ -189,10 +188,10 @@ export function LiveDashboard({goTo}:{goTo:GoTo}) {
     <section className="glass-card primary-chart"><div className="card-title-row"><div><span className="micro-label">SECURITY ANALYTICS</span><h2>Collected Event Trends</h2><p className="card-sub">최신 기록 날짜 기준 발생 추이 · 실제 로그 스냅샷</p></div><PeriodTabs period={period} onChange={setPeriod}/></div><CountTrend rows={rows} period={period}/><div className="chart-bottom"><span><span className="legend-dot"/> 로그 이벤트 건수</span><button className="live-refresh" onClick={()=>void reload()}><RefreshCw size={14}/> DB 다시 조회</button></div></section>
     <div className="dashboard-grid">
       <Panel title="Event Severity" aside={<Pill color="#eacbff">DB LEVEL</Pill>} className="severity-card">{stats?<SeverityDonut stats={stats}/>:<p>불러오는 중…</p>}</Panel>
-      <Panel title="Detection Sources" aside={<Pill color="#eacbff">LOG TYPE</Pill>} className="source-card"><div className="source-bars">{categories.map((t,i)=>{const n=stats?.by_log_type[t]??0;return <div className="bar-line" key={t}><div className="bar-label"><span>{t}</span><strong>{n}</strong></div><div className="bar-track"><div style={{width:`${n?Math.max(2,n/Math.max(1,stats?.total_events??1)*100):0}%`,background:['#8fe0d6','#ffe0b1','#bbaaff','#9bcfff','#f4b0d3'][i]}}/></div></div>})}</div><p className="source-disclaimer">로그 수집 흔적이며 현재 장비 가동 상태를 의미하지 않아.</p></Panel>
+      <Panel title="Detection Sources" aside={<Pill color="#eacbff">LOG TYPE</Pill>} className="source-card"><div className="source-bars">{categories.map((t,i)=>{const n=stats?.by_log_type[t]??0;return <div className="bar-line" key={t}><div className="bar-label"><span>{t}</span><strong>{n}</strong></div><div className="bar-track"><div style={{width:`${n?Math.max(2,n/Math.max(1,stats?.total_events??1)*100):0}%`,background:['#8fe0d6','#ffe0b1','#bbaaff','#9bcfff','#f4b0d3'][i]}}/></div></div>})}</div><p className="source-disclaimer"></p></Panel>
       <Panel title="Review Snapshot" aside={<Pill color="#f3d9ff">WORKFLOW</Pill>} className="response-card"><div className="response-gauge"><div><span>처리 완료</span><strong>{rows.length?Math.round(rows.filter(e=>e.review_status==='resolved').length/rows.length*100):0}%</strong><small>표시 중인 이벤트 기준</small></div><svg viewBox="0 0 160 100" aria-hidden="true"><path d="M 22 82 A 58 58 0 0 1 138 82" fill="none" stroke="#d4c8ed" strokeWidth="14" strokeLinecap="round"/><path d="M 22 82 A 58 58 0 0 1 138 82" pathLength="100" strokeDasharray={`${rows.length?Math.round(rows.filter(e=>e.review_status==='resolved').length/rows.length*100):0} 100`} fill="none" stroke="#5031b3" strokeWidth="14" strokeLinecap="round"/></svg></div><div className="response-summary"><span>차단 검토 요청 <strong>{responses.length}</strong></span><span>실제 차단 <strong>미연동</strong></span></div></Panel>
     </div>
-    <div className="bottom-grid"><Panel title="Recent Events" aside={<button className="text-link" onClick={()=>goTo('alerts')}>전체 보기 <ArrowRight size={15}/></button>}><EventsTable rows={recent} onSelect={setSelected}/></Panel><Panel title="Recent Response Reviews" aside={<ShieldCheck size={17}/>}><div className="response-feed">{responses.length?responses.slice(0,3).map(r=><div className="feed-entry" key={r.id}><span className="timeline-dot"/><div><strong>{r.action==='block'?'차단 검토':'해제 검토'}</strong><small>{r.target_ip} · {dateText(r.created_at)}</small><p>{responseLabel(r.status)} · 실제 실행 없음</p></div></div>):<p className="live-empty">저장된 검토 요청이 아직 없어.</p>}</div></Panel></div>
+    <div className="bottom-grid"><Panel title="Recent Events" aside={<button className="text-link" onClick={()=>goTo('alerts')}>전체 보기 <ArrowRight size={15}/></button>}><EventsTable rows={recent} onSelect={setSelected}/></Panel><Panel title="Recent Response Reviews" aside={<ShieldCheck size={17}/>}><div className="response-feed">{responses.length?responses.slice(0,3).map(r=><div className="feed-entry" key={r.id}><span className="timeline-dot"/><div><strong>{r.action==='block'?'차단 검토':'해제 검토'}</strong><small>{r.target_ip} · {dateText(r.created_at)}</small><p>{responseLabel(r.status)} · 실제 실행 없음</p></div></div>):<p className="live-empty">저장된 검토 요청이 없습니다.</p>}</div></Panel></div>
     <DetailDrawer key={selected ?? "closed"} eventId={selected} onClose={()=>setSelected(null)} onSaved={()=>void reload()} onResponse={()=>void reload()}/>
   </>
 }
@@ -210,8 +209,7 @@ export function LiveAlerts() {
   const visible=filtered.slice(page*50,(page+1)*50)
   return <>
     <Section eyebrow="EVENT TRIAGE / DATABASE" title="Alert Management" aside={<Pill color="#d8cdff">{filtered.length} EVENTS</Pill>}/>
-    <Hint>현재는 별도의 탐지 Alert 테이블이 아니라 <strong>정규화된 수집 이벤트</strong>를 분석 대상으로 보여줘. 위험도는 팀이 정규화한 info/low/medium/high/critical을 그대로 사용해.</Hint>
-    <ErrorNotice message={error}/>{capped&&<Hint>최신 2,000건만 조회하고 있어. 더 많은 데이터가 필요하면 서버 페이지네이션을 확장해야 해.</Hint>}
+    <ErrorNotice message={error}/>{capped&&<Hint>최신 2,000건만 조회하고 있씁니다. 더 많은 데이터가 필요하면 서버 페이지네이션을 확장해야 합니다.</Hint>}
     <div className="toolbar glass-card"><label className="searchbox"><Search size={18}/><input placeholder="이벤트 메시지, IP, UUID 검색" value={search} onChange={e=>{setSearch(e.target.value);setPage(0)}}/></label><label className="selectbox"><ListFilter size={16}/><select value={risk} onChange={e=>{setRisk(e.target.value);setPage(0)}}><option>전체</option>{['critical','high','medium','low','info'].map(s=><option key={s}>{s}</option>)}</select></label><label className="selectbox"><Network size={16}/><select value={type} onChange={e=>{setType(e.target.value);setPage(0)}}><option>전체</option>{categories.map(s=><option key={s}>{s}</option>)}</select></label><label className="selectbox"><ShieldCheck size={16}/><select value={status} onChange={e=>{setStatus(e.target.value);setPage(0)}}><option value="전체">전체 상태</option>{statuses.map(s=><option key={s} value={s}>{statusLabel(s)}</option>)}</select></label></div>
     <Panel title="Investigated Events" aside={<button className="live-refresh" onClick={()=>void reload()}><RefreshCw size={14}/> 새로고침</button>}>
       {loading?<p className="live-empty">데이터 조회 중…</p>:<EventsTable rows={visible} onSelect={setSelected}/>}
@@ -256,7 +254,7 @@ export function LiveLogs() {
   const searchNow=()=>{setSelected(null);setPage(0);setLoading(true);setQuery(term)}
   return <>
     <Section eyebrow="EVENT INVESTIGATION / MARIA DB" title="Log Management" aside={<Pill color="#d8cdff">{total} RECORDS</Pill>}/>
-    <Hint>검색 결과는 실제 <code>socdb.events</code>에서 가져옵니다. 페이지당 50건씩 조회하며 원본 로그는 행을 클릭할 때 별도로 불러오게 되어있어요.</Hint>
+    <Hint>페이지당 50건씩 조회하며 원본 로그는 행을 클릭할 때 별도로 불러옵니다.</Hint>
     <ErrorNotice message={error}/>
     <div className="toolbar glass-card"><div className="searchbox"><Search size={18}/><input placeholder="출발지·목적지 IP, 로그 내용, 이벤트 유형" value={term} onChange={e=>setTerm(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')searchNow()}}/><button className="live-inline-button" onClick={searchNow}>검색</button></div><label className="selectbox"><SlidersHorizontal size={16}/><select style={selectStyle} value={kind} onChange={e=>{setKind(e.target.value);setPage(0);setSelected(null);setLoading(true)}}><option value="">전체 로그</option>{categories.map(s=><option key={s}>{s}</option>)}</select></label><button className="live-refresh" onClick={()=>void load()}><RefreshCw size={15}/> 새로고침</button></div>
     <Panel title="Collected Logs" aside={<Pill color="#d8cdff">{total} DB EVENTS</Pill>}>
@@ -277,10 +275,10 @@ export function LiveMonitoring() {
     {name:'DVWA',icon:Network,desc:'취약 웹 앱 로그 · WAF 제품과 별개',n:stats?.by_log_type.dvwa??0},
     {name:'MariaDB',icon:HardDrive,desc:'DB 운영 및 감사 성격 로그',n:stats?.by_log_type.mariadb??0},
   ]
-  return <><Section eyebrow="LOG SOURCE EVIDENCE" title="Security Monitoring" aside={<button className="live-refresh" onClick={()=>void reload()}><RefreshCw size={14}/> 새로고침</button>}/><Hint>장비의 현재 작동 여부가 아니라 <strong>DB에 남아 있는 수집 기록의 존재 여부</strong>를 보여줘. VM4와 지속 연결된 실시간 상태 검사는 아직 없어.</Hint><ErrorNotice message={error}/>
+  return <><Section eyebrow="LOG SOURCE EVIDENCE" title="Security Monitoring" aside={<button className="live-refresh" onClick={()=>void reload()}><RefreshCw size={14}/> 새로고침</button>}/><ErrorNotice message={error}/>
     <div className="monitor-grid">{devices.map(d=>{const Icon=d.icon;return <div className="glass-card monitor-card" key={d.name}><div className="monitor-icon"><Icon size={25}/></div><h3>{d.name}</h3><p>{d.desc}</p><Pill color={d.n?'#a8f0eb':'#ffc8ae'}>{loading?'조회 중':d.n?`${d.n}건 수집 증적`:'데이터 없음'}</Pill><small>백업 시점의 이벤트 수</small></div>})}</div>
     <Panel title="Integration Pipeline"><div className="pipeline">{['Log Sources','Fluent Bit','Python Normalizer','MariaDB · socdb','Django API','React SOC'].map((s,i)=><div className="pipeline-item" key={s}><span>{String(i+1).padStart(2,'0')}</span><strong>{s}</strong><small>{i>=3?'로컬 스냅샷 연동':'팀 측 수집 파이프라인'}</small></div>)}</div></Panel>
-    <Hint>실제 EDR·IPS·WAF 제어/탐지 제품은 연결되지 않았고, 검토 승인도 네트워크 방화벽 정책을 변경하지 않습니다.</Hint>
+    
   </>
 }
 
@@ -302,7 +300,7 @@ export function LiveResponses() {
     setBusy(true)
     try{await decideResponse(id,decision);await load();setFeedback(`${action} 기록이 Django DB에 저장됐습니다.`)}catch(e){setError(String(e))}finally{setBusy(false)}
   }
-  return <><Section eyebrow="ACTION AUDIT TRAIL / DATABASE" title="Response History" aside={<Pill color="#d8cdff">{records.length} REQUESTS</Pill>}/><Hint>차단/해제 <strong>검토 요청과 승인 이력만</strong> 저장됩니다. 실제 네트워크 차단이나 VM2 방화벽 변경은 실행되지 않습니다.</Hint><ErrorNotice message={error}/>{feedback&&<p className="live-success">{feedback}</p>}
+  return <><Section eyebrow="ACTION AUDIT TRAIL / DATABASE" title="Response History" aside={<Pill color="#d8cdff">{records.length} REQUESTS</Pill>}/><ErrorNotice message={error}/>{feedback&&<p className="live-success">{feedback}</p>}
     <Panel title="Response Review Records" aside={<button className="live-refresh" onClick={()=>void load()}><RefreshCw size={14}/> 새로고침</button>}><div className="table-scroller"><table className="data-table"><thead><tr><th>요청 시간</th><th>출발지 IP</th><th>조치</th><th>검토 사유</th><th>상태</th><th>요청자</th><th>관리자 결정</th></tr></thead><tbody>
       {records.map(r=><tr key={r.id}><td className="mono muted">{dateText(r.created_at)}</td><td className="mono">{r.target_ip}</td><td>{r.action==='block'?'차단 검토':'해제 검토'}</td><td className="live-event-title">{r.reason||r.event_id}</td><td><Pill color={r.status==='pending'?'#ffce91':'#d4b5ff'}>{responseLabel(r.status)}</Pill></td><td>{r.created_by}</td><td>{r.status==='pending'&&user.role==='admin'?<div className="live-action-buttons"><button disabled={busy} className="line-button" onClick={()=>void decide(r.id,'approved')}>승인</button><button disabled={busy} className="line-button" onClick={()=>void decide(r.id,'rejected')}>반려</button></div>:r.decided_by??'—'}</td></tr>)}
     </tbody></table>{records.length===0&&<p className="live-empty">저장된 요청이 없어요. Alert Management에서 이벤트 상세를 열어 검토를 요청할 수 있습니다.</p>}</div></Panel><p className="live-fine">최신 100개 검토 요청까지 표시 · 승인/반려는 관리자로만 가능</p>
@@ -313,7 +311,7 @@ export function LiveReputation({goTo}:{goTo:GoTo}) {
   const {rows,error,loading,capped}=useSnapshot()
   const [ip,setIp]=useState('');const [checked,setChecked]=useState<string|null>(null)
   const matching=useMemo(()=>rows.filter(e=>e.src_ip===checked||e.dst_ip===checked),[checked,rows])
-  return <><Section eyebrow="LOCAL INDICATOR SEARCH" title="IP Reputation"/><Hint>외부 IP 평판 서비스는 아직 연결하지 않았습니다. 여기서는 <strong>로컬 SOC 로그에서 해당 IP가 관찰됐는지만</strong> 확인하며, 악성 IP라고 단정하지 않습니다.</Hint><ErrorNotice message={error}/>
+  return <><Section eyebrow="LOCAL INDICATOR SEARCH" title="IP Reputation"/><ErrorNotice message={error}/>
     <Panel title="Local IP Lookup"><div className="ip-lookup"><div className="searchbox"><Globe2 size={22}/><input value={ip} onChange={e=>setIp(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')setChecked(ip.trim())}} placeholder="로그의 IPv4 또는 IPv6 주소 검색"/></div><button className="solid-button" onClick={()=>setChecked(ip.trim())}><Search size={18}/> 로컬 로그 조회</button></div>
       {checked!==null&&<div className="ip-result"><div><span className="micro-label">LOCAL EVIDENCE RESULT</span><h3>{checked||'IP를 입력해 줘'}</h3></div><Pill color="#ffddb3">외부 악성 평판 미조회</Pill><p>일치하는 수집 이벤트: <strong>{loading?'조회 중':matching.length}건</strong> ({capped?'최신 2,000건 기준':'현재 DB 스냅샷 기준'})</p><p>수집 로그에 등장했다는 사실만으로 공격 주체로 판단할 수 없습니다.</p>{matching.length>0&&<button className="text-link" onClick={()=>goTo('alerts')}>Alert Management에서 분석하기 <ArrowRight size={15}/></button>}</div>}
     </Panel></>
@@ -361,7 +359,7 @@ export function LiveSettings(){
   const {user}=useAuth()
   const [error,setError]=useState('');const [connection,setConnection]=useState<string>('확인 전')
   const check=async()=>{try{const v=await getStats();setConnection(`Django ↔ MariaDB 연결됨 · 이벤트 ${v.total_events}건`);setError('')}catch(e){setConnection('연결 실패');setError(String(e))}}
-  return <><Section eyebrow="SYSTEM PREFERENCES" title="Settings"/><Hint>현재 로그인/관리자 기능은 Django 계정 시스템으로 처리되고 있어요. 알림 메일, SMTP, 실제 차단 정책 설정은 서버 기능이 아직 없어 이 화면에서 설정할 수 없습니다.</Hint><ErrorNotice message={error}/><div className="settings-grid">
+  return <><Section eyebrow="SYSTEM PREFERENCES" title="Settings"/><ErrorNotice message={error}/><div className="settings-grid">
     <Panel title="System Connections"><div className="evidence-list">{[['Frontend','React / Vite'],['Backend','Django REST-style API'],['SOC logs','MariaDB · socdb.events'],['Login & Reviews','MariaDB · soc_dashboard'],['Current role',user.role],['Database check',connection]].map(([k,v])=><div key={k}><span>{k}</span><strong>{v}</strong></div>)}</div><button className="line-button live-check" onClick={()=>void check()}><Activity size={16}/> DB 연결 확인</button></Panel>
     <Panel title="Unavailable integrations"><div className="evidence-list">{[['SMTP 메일','미연동'],['VM4 실시간 스트리밍','미연동'],['방화벽 실행 승인 후 적용','미연동'],['외부 IP 평판 API','미연동']].map(([k,v])=><div key={k}><span>{k}</span><Pill color="#ffdab0">{v}</Pill></div>)}</div><p className="fine-note">설정 파일과 비밀번호는 프론트엔드에 노출하지 않고 서버에서 관리합니다.</p></Panel>
   </div></>
