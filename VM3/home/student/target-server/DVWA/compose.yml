@@ -1,0 +1,57 @@
+# compose.yml (label을 부여하여 식별할 수 있게 조치)
+volumes:
+  dvwa:
+  fluent_bit_state:
+
+networks:
+  dvwa:
+
+services:
+  dvwa:
+    build: .
+    image: ghcr.io/digininja/dvwa:latest
+    pull_policy: always
+    environment:
+      - DB_SERVER=db
+    depends_on:
+      - db
+    networks:
+      - dvwa
+    ports:
+      - 192.168.56.130:4280:80
+    restart: unless-stopped
+    labels:
+      log_source: "apache"
+    logging:
+      driver: json-file
+      options:
+        labels: "log_source"
+
+  db:
+    image: docker.io/library/mariadb:10
+    environment:
+      - MYSQL_ROOT_PASSWORD=dvwa
+      - MYSQL_DATABASE=dvwa
+      - MYSQL_USER=dvwa
+      - MYSQL_PASSWORD=p@ssw0rd
+    volumes:
+      - dvwa:/var/lib/mysql
+    networks:
+      - dvwa
+    restart: unless-stopped
+    labels:
+      log_source: "mariadb"
+    logging:
+      driver: json-file
+      options:
+       labels: "log_source"
+
+  fluent-bit:
+    image: fluent/fluent-bit:3.2
+    container_name: vm3-fluent-bit
+    volumes:
+      - /var/lib/docker/containers:/docker-logs:ro
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - fluent_bit_state:/fluent-bit/state
+      - /var/log/audit:/var/log/audit:ro
+    restart: unless-stopped

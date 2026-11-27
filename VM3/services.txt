@@ -1,0 +1,11 @@
+docker-0962cefdd28c883c878bfe5f4adcb41a60d899a174919501a99f8c3fe1a810db.scope transient       -
+docker-5674cf5707ce719b4a29e79e5c948427636ead7eca36b9a941b30cdf3bb0f740.scope transient       -
+docker-d3ca73af279224109b135d00b0ab7a8565f7903224f2550760bfa455a4664473.scope transient       -
+auditd.service                                                                enabled         enabled
+containerd.service                                                            enabled         enabled
+docker.service                                                                enabled         enabled
+rsyslog.service                                                               enabled         enabled
+ssh.service                                                                   disabled        enabled
+docker.socket                                                                 enabled         enabled
+ssh.socket                                                                    enabled         enabled
+rescue-ssh.target                                                             static          -

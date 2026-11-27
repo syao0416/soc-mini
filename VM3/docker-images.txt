@@ -1,0 +1,5 @@
+IMAGE                           ID             DISK USAGE   CONTENT SIZE   EXTRA
+fluent/fluent-bit:3.2           d6dec000c492        145MB         42.7MB   U    
+ghcr.io/digininja/dvwa:latest   61167ec23fbf        843MB          213MB   U    
+hello-world:latest              1e4c05b897a7       25.9kB         9.49kB        
+mariadb:10                      e5fe75b2b9de        459MB          109MB   U    
