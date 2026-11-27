@@ -1,0 +1,4 @@
+CONTAINER ID   IMAGE                           COMMAND                  CREATED      STATUS              PORTS                         NAMES
+0962cefdd28c   fluent/fluent-bit:3.2           "/fluent-bit/bin/flu…"   2 days ago   Up About a minute   2020/tcp                      vm3-fluent-bit
+5674cf5707ce   ghcr.io/digininja/dvwa:latest   "docker-php-entrypoi…"   2 days ago   Up About a minute   192.168.56.130:4280->80/tcp   dvwa-dvwa-1
+d3ca73af2792   mariadb:10                      "docker-entrypoint.s…"   2 days ago   Up About a minute   3306/tcp                      dvwa-db-1
