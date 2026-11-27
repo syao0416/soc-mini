@@ -1,0 +1,18 @@
+# Add these lines to your EXISTING dashboard/.env; do not replace existing database settings.
+# Use SMTP credentials from your mail provider; NEVER commit this .env.
+SOC_SMTP_HOST=smtp.example.com
+SOC_SMTP_PORT=587
+SOC_SMTP_USER=your_account@example.com
+SOC_SMTP_PASSWORD=YOUR_APP_PASSWORD
+SOC_SMTP_FROM=your_account@example.com
+SOC_SMTP_STARTTLS=true
+SOC_SMTP_SSL=false
+# Only for a trusted SMTP relay that explicitly does not require authentication:
+# SOC_SMTP_ALLOW_ANONYMOUS=true
+
+# Optional: only if VM4 is reachable from the Django container and a read-only DB account exists.
+# SOC_LOGS_HOST=192.168.56.140
+# SOC_LOGS_PORT=3306
+# SOC_LOGS_DB=socdb
+# SOC_LOGS_USER=soc_readonly
+# SOC_LOGS_PASSWORD=READ_ONLY_ACCOUNT_PASSWORD

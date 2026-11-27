@@ -1,0 +1,12 @@
+docker-9fbeef997814d4dc18f08c65deabefa45251f8ab0c4881af7cf90613215cffa0.scope transient       -
+docker-b7c89c4879a6db2ebf74217e6ef562aba64e1e20565c9491ff840737589dbb6f.scope transient       -
+docker-ba068454ffc26b2dafd9336b0707c5aed22589fbb6dc44a55a5df2dc5609beea.scope transient       -
+docker-f03143c71b217e26df65982d87487cb6b376099c778523767a3d13a3164b5d03.scope transient       -
+containerd.service                                                            enabled         enabled
+docker.service                                                                enabled         enabled
+rsyslog.service                                                               enabled         enabled
+soc-loader.service                                                            enabled         enabled
+soc-normalizer.service                                                        enabled         enabled
+ssh.service                                                                   disabled        enabled
+docker.socket                                                                 enabled         enabled
+ssh.socket                                                                    enabled         enabled

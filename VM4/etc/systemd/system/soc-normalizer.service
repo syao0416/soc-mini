@@ -1,0 +1,15 @@
+[Unit]
+Description=SOC Log Normalizer
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=student
+WorkingDirectory=/home/student/soc-lab/soc
+ExecStart=/home/student/soc-lab/soc/.venv/bin/python -u -m normalizer.main
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

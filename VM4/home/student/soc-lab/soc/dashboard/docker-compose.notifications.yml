@@ -1,0 +1,21 @@
+# Start the optional notification worker with:
+# docker compose -f docker-compose.yml -f docker-compose.notifications.yml up -d --build
+services:
+  alert-worker:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: '3306'
+      DB_NAME: ${MARIADB_DATABASE}
+      DB_USER: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_DEBUG: 'true'
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: python manage.py send_soc_alerts --loop --interval 60

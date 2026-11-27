@@ -1,0 +1,58 @@
+import json
+from django.contrib.auth import authenticate, login, logout
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+from django.views.decorators.http import require_GET, require_POST
+
+
+def user_payload(user):
+    return {
+        'id': user.pk,
+        'username': user.get_username(),
+        'role': 'admin' if user.is_superuser else 'analyst',
+    }
+
+
+@require_GET
+@ensure_csrf_cookie
+
+def csrf_view(request):
+    return JsonResponse({'csrfToken': get_token(request)})
+
+
+@require_POST
+@csrf_protect
+def login_view(request):
+    try:
+        body = json.loads(request.body.decode('utf-8'))
+    except (ValueError, UnicodeDecodeError):
+        return JsonResponse({'detail': '올바른 JSON 형식이 아니에요.'}, status=400)
+    if not isinstance(body, dict):
+        return JsonResponse({'detail': '잘못된 요청이에요.'}, status=400)
+
+    username = body.get('username', '')
+    password = body.get('password', '')
+    if not isinstance(username, str) or not isinstance(password, str) or not username or not password:
+        return JsonResponse({'detail': '아이디와 비밀번호를 모두 입력해 줘.'}, status=400)
+
+    user = authenticate(request, username=username, password=password)
+    if user is None:
+        return JsonResponse({'detail': '아이디 또는 비밀번호가 올바르지 않아요.'}, status=401)
+
+    login(request, user)
+    return JsonResponse({'user': user_payload(user)})
+
+
+@require_GET
+def me_view(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'detail': '로그인이 필요해요.'}, status=401)
+    return JsonResponse({'user': user_payload(request.user)})
+
+
+@require_POST
+@csrf_protect
+def logout_view(request):
+    logout(request)
+    return JsonResponse({'ok': True})

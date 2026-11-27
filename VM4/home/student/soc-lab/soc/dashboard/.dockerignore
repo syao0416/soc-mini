@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+*.log
+.env
+.env.*
+backend/
+vm2-agent/
+vm2-integration-source/

@@ -1,0 +1,5 @@
+CONTAINER ID   IMAGE                   COMMAND                  CREATED        STATUS              PORTS                                       NAMES
+ba068454ffc2   soc-dashboard           "docker-entrypoint.s…"   5 hours ago    Up About a minute   192.168.56.140:5173->5173/tcp               soc-dashboard
+f03143c71b21   soc-api                 "sh -c 'python manag…"   27 hours ago   Up About a minute   8000/tcp                                    soc-api
+b7c89c4879a6   fluent/fluent-bit:3.2   "/fluent-bit/bin/flu…"   2 days ago     Up About a minute   2020/tcp, 192.168.56.140:24224->24224/tcp   soc-fluent-bit
+9fbeef997814   mariadb:10              "docker-entrypoint.s…"   2 days ago     Up About a minute   127.0.0.1:13306->3306/tcp                   soc-db

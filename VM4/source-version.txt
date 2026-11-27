@@ -1,0 +1,15 @@
+37e8dfea1a709b1a8ad1be36d971d0ff8d9adcb3
+ M compose.yaml
+ M loader/requirements.txt
+ M normalizer/main.py
+ M normalizer/normalizer.py
+ M normalizer/parsers/iptables.py
+ M normalizer/severity.py
+?? compose.yaml.bak
+?? dashboard/
+?? normalizer/main.py.20261126-161122.bak
+?? normalizer/normalizer.py.20261126-161122.bak
+?? normalizer/parsers/auditd.py
+?? normalizer/parsers/auditd.py.20261126-161122.bak
+?? normalizer/severity.py.20261126-161122.bak
+?? socdb_dump.sql
