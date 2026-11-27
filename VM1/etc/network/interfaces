@@ -1,0 +1,20 @@
+
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+  address 192.168.10.110
+  netmask 255.255.255.0
+  gateway 192.168.10.120
+  dns-nameservers 8.8.8.8 8.8.4.4
+
+#auto eth1
+#iface eth1 inet static
+#  address 192.168.56.30
+#  netmask 255.255.255.0
