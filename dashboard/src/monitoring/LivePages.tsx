@@ -210,7 +210,7 @@ export function LiveAlerts() {
   const visible=filtered.slice(page*50,(page+1)*50)
   return <>
     <Section eyebrow="EVENT TRIAGE / DATABASE" title="Alert Management" aside={<Pill color="#d8cdff">{filtered.length} EVENTS</Pill>}/>
-    <ErrorNotice message={error}/>{capped&&<Hint>최신 2,000건만 조회하고 있씁니다. 더 많은 데이터가 필요하면 서버 페이지네이션을 확장해야 합니다.</Hint>}
+    <ErrorNotice message={error}/>{capped&&<Hint>최신 2,000건만 조회하고 있습니다. 더 많은 데이터가 필요하면 서버 페이지네이션을 확장해야 합니다.</Hint>}
     <div className="toolbar glass-card"><label className="searchbox"><Search size={18}/><input placeholder="이벤트 메시지, IP, UUID 검색" value={search} onChange={e=>{setSearch(e.target.value);setPage(0)}}/></label><label className="selectbox"><ListFilter size={16}/><select value={risk} onChange={e=>{setRisk(e.target.value);setPage(0)}}><option>전체</option>{['critical','high','medium','low','info'].map(s=><option key={s}>{s}</option>)}</select></label><label className="selectbox"><Network size={16}/><select value={type} onChange={e=>{setType(e.target.value);setPage(0)}}><option>전체</option>{categories.map(s=><option key={s}>{s}</option>)}</select></label><label className="selectbox"><ShieldCheck size={16}/><select value={status} onChange={e=>{setStatus(e.target.value);setPage(0)}}><option value="전체">전체 상태</option>{statuses.map(s=><option key={s} value={s}>{statusLabel(s)}</option>)}</select></label></div>
     <Panel title="Investigated Events" aside={<button className="live-refresh" onClick={()=>void reload()}><RefreshCw size={14}/> 새로고침</button>}>
       {loading?<p className="live-empty">데이터 조회 중…</p>:<EventsTable rows={visible} onSelect={setSelected}/>}

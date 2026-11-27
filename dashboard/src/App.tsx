@@ -31,13 +31,13 @@ function App(){
     <div className="sparkle-star star-one" aria-hidden="true">✦</div><div className="sparkle-star star-two" aria-hidden="true">✧</div>
     {drawerOpen&&<button className="drawer-scrim" aria-label="메뉴 닫기" onClick={()=>setDrawerOpen(false)}/>}
     <aside className={'slide-drawer '+(drawerOpen?'open':'')} aria-label="메인 메뉴" aria-hidden={!drawerOpen}>
-      <div className="drawer-head"><div className="brand"><span className="brand-symbol"><Shield size={21}/></span><span>MINI<strong>SOC</strong><small>SECURITY INTELLIGENCE</small></span></div><button className="icon-btn" onClick={()=>setDrawerOpen(false)} aria-label="메뉴 닫기"><X size={21}/></button></div>
+      <div className="drawer-head"><div className="brand"><span className="brand-symbol"><Shield size={21}/></span><span>JIKIMI<small>SECURITY INTELLIGENCE</small></span></div><button className="icon-btn" onClick={()=>setDrawerOpen(false)} aria-label="메뉴 닫기"><X size={21}/></button></div>
       <div className="drawer-label">WORKSPACE</div>
       <nav className="drawer-links">{navItems.map(i=>{const Icon=i.icon;return <button key={i.id} onClick={()=>selectPage(i.id)} className={'drawer-link '+(page===i.id?'active':'')} tabIndex={drawerOpen?0:-1}><Icon size={19}/><span>{i.label}<small>{i.ko}</small></span><ArrowRight size={16}/></button>})}</nav>
-      <div className="drawer-foot"><span className="pulse-dot"/> DEMO MODE <small>실제 장비·메일·차단 미연동</small></div>
+      
     </aside>
     <header className="topbar">
-      <div className="topbar-start"><button onClick={()=>setDrawerOpen(true)} className="menu-toggle" aria-label="메뉴 열기"><Menu size={26}/></button><div className="wordmark">MINI<span>SOC</span></div><span className="topbar-sep"/><span className="topbar-label">{selectedTitle}</span></div>
+      <div className="topbar-start"><button onClick={()=>setDrawerOpen(true)} className="menu-toggle" aria-label="메뉴 열기"><Menu size={26}/></button><div className="wordmark">JIKIMI</div><span className="topbar-sep"/><span className="topbar-label">{selectedTitle}</span></div>
       <div className="topbar-right"><span className="demo-chip"><span className="pulse-dot"/> DB SNAPSHOT</span><button className="icon-btn notifications" title="신규 Alert 확인" onClick={()=>selectPage('alerts')} aria-label="경고 관리 열기"><Bell size={20}/></button><ProfileMenu /></div>
     </header>
     <main className="page-wrap">
@@ -49,7 +49,7 @@ function App(){
       {page==='reputation' && <LiveReputation goTo={selectPage}/>}
       {page==='reports' && <LiveReports/>}
       {page==='settings' && <SocSettings/>}
-      <footer className="footer"><span>MINI SOC <i>✦</i> Security Operations Center</span><span>DESIGN SYSTEM / PURPLE GLASS · FRONTEND DEMO</span></footer>
+      <footer className="footer"><span>JIKIMI<i>✦</i> Security Operations Center</span></footer>
     </main>
   </div>
 }

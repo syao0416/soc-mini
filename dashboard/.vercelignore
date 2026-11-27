@@ -1,0 +1,11 @@
+.env
+.env.*
+backend/
+local-data/
+local-backups/
+vm2-agent/
+*.sql
+*.pem
+*.key
+*.bak
+*.zip
