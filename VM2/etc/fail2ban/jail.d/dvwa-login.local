@@ -1,0 +1,16 @@
+[dvwa-login]
+enabled   = true
+filter    = dvwa-login
+logpath   = /var/log/dvwa-access.log
+backend   = polling
+
+findtime  = 60 # 테스트를 위해 1분으로 지정했습니다
+maxretry  = 5
+bantime   = 600
+
+port      = 4280
+protocol  = tcp
+chain     = FORWARD
+banaction = iptables-multiport
+usedns    = no
+ignoreip  = 127.0.0.1/8 ::1 192.168.56.1

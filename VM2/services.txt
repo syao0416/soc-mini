@@ -1,0 +1,9 @@
+auditd.service                               enabled         enabled
+fail2ban.service                             enabled         enabled
+fluent-bit.service                           enabled         enabled
+netfilter-persistent.service                 enabled         enabled
+rsyslog.service                              enabled         enabled
+snort.service                                generated       -
+ssh.service                                  disabled        enabled
+ssh.socket                                   enabled         enabled
+rescue-ssh.target                            static          -

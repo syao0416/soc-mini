@@ -1,0 +1,1 @@
+soc-agent ALL=(root) NOPASSWD: /opt/soc-agent/remote_apply.sh ""
