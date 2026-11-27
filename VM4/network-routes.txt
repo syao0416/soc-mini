@@ -1,0 +1,5 @@
+default via 10.0.2.1 dev enp0s3 proto static 
+10.0.2.0/24 dev enp0s3 proto kernel scope link src 10.0.2.140 
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown 
+172.18.0.0/16 dev br-e7840dd075e0 proto kernel scope link src 172.18.0.1 
+192.168.56.0/24 dev enp0s8 proto kernel scope link src 192.168.56.140 

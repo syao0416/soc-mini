@@ -1,0 +1,7 @@
+IMAGE                   ID             DISK USAGE   CONTENT SIZE   EXTRA
+fluent/fluent-bit:3.2   d6dec000c492        145MB         42.7MB   U    
+hello-world:latest      1e4c05b897a7       25.9kB         9.49kB        
+mariadb:10              e5fe75b2b9de        459MB          109MB   U    
+postgres:17             223efeb19632        671MB          173MB        
+soc-api:latest          f526525f9c25        710MB          168MB   U    
+soc-dashboard:latest    1fa0ad52864c        569MB          139MB   U    

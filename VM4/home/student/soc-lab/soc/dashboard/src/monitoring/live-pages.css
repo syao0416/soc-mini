@@ -1,0 +1,19 @@
+.live-error,.live-success{display:flex;gap:9px;align-items:flex-start;padding:12px 16px;margin:12px 0;border:1px solid rgba(255,160,160,.55);border-radius:13px;background:rgba(255,140,140,.10);color:#ffe4e4;font-size:13px}
+.live-success{border-color:rgba(156,239,206,.55);background:rgba(156,239,206,.1);color:#dbfff5}
+.live-fine{color:#d8d3ee;font-size:12px;opacity:.85;margin-top:12px}
+.live-empty{padding:14px 3px;color:#d1c8ed;font-size:13px}
+.live-refresh{display:inline-flex;gap:6px;align-items:center;background:transparent;border:0;color:#e4d9ff;font:inherit;font-size:12px;cursor:pointer}
+.live-refresh:hover{text-decoration:underline}
+.live-event-title{max-width:330px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.live-uuid{font-family:monospace;overflow-wrap:anywhere;font-size:11px}
+.live-pagination{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 8px;color:#d7ceef;font-size:12px}
+.live-pagination>div{display:flex;align-items:center;gap:12px}
+.live-pagination .line-button{font-size:12px;padding:6px 11px}
+.live-pagination button:disabled,.detail-actions button:disabled,.solid-button:disabled{opacity:.5;cursor:not-allowed}
+.live-inline-button{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:white;padding:6px 12px;cursor:pointer}
+.live-selected{background:rgba(193,174,255,.15)}
+.live-action-buttons{display:flex;gap:8px}
+.live-action-buttons button{font-size:12px;padding:6px 9px}
+.live-check{margin-top:16px}
+.live-check,.live-event-title,.live-error{overflow-wrap:anywhere}
+@media (max-width:700px){.live-pagination{flex-direction:column;align-items:flex-start}.live-action-buttons{flex-wrap:wrap}.live-event-title{max-width:190px}}
